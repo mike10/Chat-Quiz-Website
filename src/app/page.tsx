@@ -1,3 +1,4 @@
+'use client'
 import SignInGoogleAccount from "@/components/SignInGoogleAccount";
 
 export default function Home() {
