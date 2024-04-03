@@ -1,9 +1,9 @@
+import Chat from "@/components/Chat";
 
-
-const page = () => {
+const Page = () => {
     return (
-          <p>Main</p>  
+         <Chat />   
     )
 }
 
-export default page;
+export default Page;
