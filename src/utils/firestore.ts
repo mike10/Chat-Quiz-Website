@@ -1,9 +1,10 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import {IInitForChat} from '@/utils/constants'
+import IInitForChat, {ISendMessage} from '@/utils/constants'
 import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, arrayUnion, onSnapshot, getDoc, query, where, getDocs } from "firebase/firestore";
 import { getMessagesToChat } from '@/redux/sliceChat'
+import { getAllUsers } from '@/redux/sliceUsers'
 import {AppDispatch} from '@/redux/store'
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -40,7 +41,7 @@ export const getAllMessages = async () => {
   }
 }
 
-export const getAllUsers = async () => {
+/* export const getAllUsers = async () => {
   try {
     const docRef = doc(db, "users", "default");
     const docSnap = await getDoc(docRef);
@@ -54,11 +55,11 @@ export const getAllUsers = async () => {
   } catch (e) {
     console.error("<getAllUsers> Error adding document: ", e);
   }
-}
+} */
 
 export const addUserToChat = async (newUser:string) => {
   try {
-    const roomRef = doc(db, "room", "default");
+    const roomRef = doc(db, "users", "default");
     await updateDoc(roomRef, {
       users: arrayUnion(newUser)
   });
@@ -68,7 +69,7 @@ export const addUserToChat = async (newUser:string) => {
   }
 }
 
-export const addNewMessage = async ({user, message}:{user:string, message:string}) => {
+export const addNewMessage = async ({user, message}:ISendMessage) => {
   try {
     const time:number = Date.now()
     const docData = {
@@ -101,7 +102,9 @@ export const  getMessagesFromChat = (dispatch:AppDispatch)=>{
   });
 }
 
-
-const unsubscribeUsers = onSnapshot(doc(db, "users", "default"), (doc) => {
-  console.log("Changes data in Users: ", doc.data());
-});
+export const getUsers = (dispatch:AppDispatch) => {
+  const unsubscribeUsers = onSnapshot(doc(db, "users", "default"), (doc) => {
+    console.log("Changes data in Users: ", doc.data());
+    dispatch(getAllUsers(doc.data()))
+  });
+}

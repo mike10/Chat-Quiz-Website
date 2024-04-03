@@ -14,10 +14,11 @@ export const sliceUsers = createSlice({
   initialState,
   reducers: {
     setUser: (state, PayloadAction) => {
+      console.log('++++++++',PayloadAction.payload);
       state.user = PayloadAction.payload;
     },
-    getAllUsers: (state) => {
-      
+    getAllUsers: (state, PayloadAction ) => {
+      state.users = PayloadAction.payload;
     },
     addNewUser: () => {
 

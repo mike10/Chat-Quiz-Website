@@ -9,7 +9,6 @@ const initialState: IInitForChat[] = []
 
 export const sliceChat = createSlice({
   name: 'chat',
-  // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
     getAllMessages: (state) => {
@@ -19,14 +18,11 @@ export const sliceChat = createSlice({
       state.push(PayloadAction.payload)
     },
     setMessageToChat: (state, PayloadAction) => {
-      console.log(PayloadAction.payload);
+      //console.log(PayloadAction.payload);
     }
   },
 })
 
 export const { getAllMessages, getMessagesToChat, setMessageToChat } = sliceChat.actions
-
-// Other code such as selectors can use the imported `RootState` type
-//export const selectCount = (state: RootState) => state.counter.value
 
 export default sliceChat.reducer

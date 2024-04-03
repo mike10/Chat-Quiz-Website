@@ -7,3 +7,8 @@ export interface IInitForUsers {
     user: string,
     users: Array<string>,
 }
+
+export interface ISendMessage {
+    user: string,
+    message: string,
+}
