@@ -14,19 +14,15 @@ export const sliceUsers = createSlice({
   initialState,
   reducers: {
     setUser: (state, PayloadAction) => {
-      console.log('++++++++',PayloadAction.payload);
       state.user = PayloadAction.payload;
     },
     getAllUsers: (state, PayloadAction ) => {
       state.users = PayloadAction.payload;
     },
-    addNewUser: () => {
-
-    }
   },
 })
 
-export const { setUser, getAllUsers, addNewUser } = sliceUsers.actions
+export const { setUser, getAllUsers } = sliceUsers.actions
 
 // Other code such as selectors can use the imported `RootState` type
 //export const selectCount = (state: RootState) => state.counter.value

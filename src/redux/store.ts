@@ -1,17 +1,19 @@
-'use client'
+//'use client'
 import { configureStore } from '@reduxjs/toolkit'
 import { applyMiddleware } from 'redux'
 import createSagaMiddleware from 'redux-saga';
 import rootSaga from './saga';
-import sliceChat from '@/redux/sliceChat'
+import sliceChat from './sliceChat'
 import sliceUsers from './sliceUsers';
+import sliceQuiz from './sliceQuiz';
 
 const sagaMiddleware = createSagaMiddleware();
 
 export const store = configureStore({
     reducer: {
         chat: sliceChat,
-        users: sliceUsers
+        users: sliceUsers,
+        quiz: sliceQuiz,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(sagaMiddleware)
   })

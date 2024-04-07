@@ -2,9 +2,10 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import IInitForChat, {ISendMessage} from '@/utils/constants'
-import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, arrayUnion, onSnapshot, getDoc, query, where, getDocs } from "firebase/firestore";
+import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, arrayUnion, onSnapshot, getDoc, query, where, getDocs, arrayRemove } from "firebase/firestore";
 import { getMessagesToChat } from '@/redux/sliceChat'
 import { getAllUsers } from '@/redux/sliceUsers'
+import { getAskQuiz, setAskQuiz } from '@/redux/sliceQuiz'
 import {AppDispatch} from '@/redux/store'
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -26,7 +27,7 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 
-export const getAllMessages = async () => {
+/* export const getAllMessages = async () => {
   try {
     const q = query(collection(db, "chat"), where("time", ">", Date.now()-30*60*1000));
     console.log('firestore getAllMessage');
@@ -39,7 +40,7 @@ export const getAllMessages = async () => {
   } catch (e) {
     console.error("<getAllUsers> Error adding document: ", e);
   }
-}
+} */
 
 /* export const getAllUsers = async () => {
   try {
@@ -57,17 +58,7 @@ export const getAllMessages = async () => {
   }
 } */
 
-export const addUserToChat = async (newUser:string) => {
-  try {
-    const roomRef = doc(db, "users", "default");
-    await updateDoc(roomRef, {
-      users: arrayUnion(newUser)
-  });
-    //console.log("Document written with ID: ", docRef.id);
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
-}
+
 
 export const addNewMessage = async ({user, message}:ISendMessage) => {
   try {
@@ -86,25 +77,71 @@ export const addNewMessage = async ({user, message}:ISendMessage) => {
 
 export const  getMessagesFromChat = (dispatch:AppDispatch)=>{
   const q = query(collection(db, "chat"), where("time", ">", Date.now()-30*60*1000));
-  const unsubscribeChat = onSnapshot(q, (snapshot) => {
+  const unsubscribe = onSnapshot(q, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
       if (change.type === "added") {
         console.log("New message: ", change.doc.data());
         dispatch(getMessagesToChat(change.doc.data()))
       }
-      /* if (change.type === "modified") {
-        console.log("Modified city: ", change.doc.data());
-      }
-      if (change.type === "removed") {
-        console.log("Removed city: ", change.doc.data());
-      } */
+      // if (change.type === "modified") {
+      //   console.log("Modified city: ", change.doc.data());
+      // }
+      // if (change.type === "removed") {
+      //   console.log("Removed city: ", change.doc.data());
+      // } 
     });
   });
+  return unsubscribe
 }
 
 export const getUsers = (dispatch:AppDispatch) => {
-  const unsubscribeUsers = onSnapshot(doc(db, "users", "default"), (doc) => {
-    console.log("Changes data in Users: ", doc.data());
-    dispatch(getAllUsers(doc.data()))
+  const unsubscribe = onSnapshot(doc(db, "users", "default"), (doc) => {
+    console.log("firestore-getUsers: ", doc.data());
+    if(doc.data()?.users) dispatch(getAllUsers(doc.data()?.users))
+  });
+  return ()=>{
+
+    unsubscribe()
+  }
+}
+
+export const quitUser = async(quitUser:string) => {
+  try {
+    const roomRef = doc(db, "users", "default");
+    await updateDoc(roomRef, {
+      users: arrayRemove(quitUser)
+  });
+    //console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+}
+
+export const addUserToChat = async (newUser:string) => {
+  try {
+    const roomRef = doc(db, "users", "default");
+    await updateDoc(roomRef, {
+      users: arrayUnion(newUser)
+  });
+    //console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+}
+
+export const getQuiz = (dispatch:AppDispatch) => {
+  const unsubscribe = onSnapshot(doc(db, "quiz", "start"), (doc) => {
+    console.log("firestore-getQuiz", doc.data());
+    dispatch(getAskQuiz(doc.data()))
+  });
+  return  unsubscribe;
+}
+
+export const setQuiz = async () => {
+  const time:number = Date.now()
+  await setDoc(doc(db, "quiz", "start"), {
+    name: "quiz",
+    time,
+    user: ""
   });
 }

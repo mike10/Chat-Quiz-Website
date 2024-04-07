@@ -18,7 +18,7 @@ export const sliceChat = createSlice({
       state.push(PayloadAction.payload)
     },
     setMessageToChat: (state, PayloadAction) => {
-      //console.log(PayloadAction.payload);
+      console.log(PayloadAction.payload);
     }
   },
 })
