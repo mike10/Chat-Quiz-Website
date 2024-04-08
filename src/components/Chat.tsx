@@ -32,7 +32,7 @@ const Chat: React.FC = () => {
     return () => {
       unscribe1()
       unscribe2()
-      unscribe3()
+      //unscribe3()
       quitUser(user)
     };
   }, []) 

@@ -121,13 +121,11 @@ export const addUserToChat = async (newUser:string) => {
 }
 
 export const getQuiz = (dispatch:AppDispatch) => {
-  const q = query(collection(db, "quiz"), where("time", ">", Date.now()));
+  const q = query(collection(db, "quiz")/* , where("time", ">", Date.now()) */);
   const unsubscribe = onSnapshot(q, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
-      if (change.type === "added") {
-        console.log("New quiz: ", change.doc.data());
-        dispatch(getAskQuiz(change.doc.data()))
-      }
+      console.log("New quiz: ", change.doc.data());
+      dispatch(getAskQuiz(change.doc.data()))
     });
   });
   return  unsubscribe;
