@@ -15,10 +15,10 @@ export const sliceChat = createSlice({
       
     },
     getMessagesToChat: (state, PayloadAction) => {
-      state.push(PayloadAction.payload)
+      state.push(PayloadAction.payload);
     },
     setMessageToChat: (state, PayloadAction) => {
-      console.log(PayloadAction.payload);
+      //console.log(PayloadAction.payload);
     }
   },
 })

@@ -5,9 +5,10 @@ import { setAskQuiz } from  "@/redux/sliceQuiz"
 import { Button, Divider, Flex } from "antd";
 import { Input } from 'antd';
 import {getMessagesFromChat, getUsers, getQuiz, quitUser} from '@/utils/firestore'
-import { useEffect, useMemo, useRef, useState } from "react";
+import { FunctionComponent, ReactElement, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import IInitForChat from '@/utils/constants'
 import ReadyForQuiz from "./ReadyForQuiz";
+import Message from "./Message";
 import styled from "styled-components";
 const { TextArea } = Input;
 
@@ -22,16 +23,7 @@ const Chat: React.FC = () => {
 
   useMemo(() => {
     console.log('useMemo quiz', quiz, isQuiz);
-    
-    //setIsQuiz(quiz)
   }, [quiz]);
-
-
-  /* const Display = styled.div`
-    width: 100%;
-    height: 500px;
-    overflow: scroll;
-  `; */
 
   useEffect(()=>{
     const unscribe1 = getMessagesFromChat(dispatch)
@@ -76,26 +68,8 @@ const Chat: React.FC = () => {
           style={{ width: "100%", height: "500px", overflow: "scroll" }}
         >
           
-          
-          {messages.map((item: IInitForChat, index: number) => {
-            const time = new Date(item.time);
-            return (
-              <div key={index}>
-                <p>
-                  
-                  <span className="text-xs bg-lime-700 rounded px-1">{item.user}</span>
-                  <span style={{fontSize: '8px', backgroundColor: '#EDAAC0', color: '#fff', borderRadius: '4px', padding: '1px 5px', lineHeight: '100%'}}>
-                    {time.getHours() < 10 ? '0'+time.getHours():time.getHours()}{':'}
-                    {time.getMinutes() < 10 ? '0'+time.getMinutes():time.getMinutes()}{':'}
-                    {time.getSeconds()  < 10 ? '0'+time.getSeconds():time.getSeconds()}
-                  </span>
-                </p>
-                
-                <div style={{fontSize: '12px', fontWeight: '500', backgroundColor: '#EEE',borderRadius: '4px'}}>{item.message}</div>
-              </div>
-            );
-          })}
-          {quiz != isQuiz ? <ReadyForQuiz/> : 'null'}
+          {messages.map((item: IInitForChat, index: number) => <Message {...item} />)}
+          {quiz ? <ReadyForQuiz/> : null}
         </div>
         <TextArea
           placeholder="input your message"

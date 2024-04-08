@@ -83,12 +83,6 @@ export const  getMessagesFromChat = (dispatch:AppDispatch)=>{
         console.log("New message: ", change.doc.data());
         dispatch(getMessagesToChat(change.doc.data()))
       }
-      // if (change.type === "modified") {
-      //   console.log("Modified city: ", change.doc.data());
-      // }
-      // if (change.type === "removed") {
-      //   console.log("Removed city: ", change.doc.data());
-      // } 
     });
   });
   return unsubscribe
@@ -100,7 +94,6 @@ export const getUsers = (dispatch:AppDispatch) => {
     if(doc.data()?.users) dispatch(getAllUsers(doc.data()?.users))
   });
   return ()=>{
-
     unsubscribe()
   }
 }
@@ -111,7 +104,6 @@ export const quitUser = async(quitUser:string) => {
     await updateDoc(roomRef, {
       users: arrayRemove(quitUser)
   });
-    //console.log("Document written with ID: ", docRef.id);
   } catch (e) {
     console.error("Error adding document: ", e);
   }
@@ -123,16 +115,20 @@ export const addUserToChat = async (newUser:string) => {
     await updateDoc(roomRef, {
       users: arrayUnion(newUser)
   });
-    //console.log("Document written with ID: ", docRef.id);
   } catch (e) {
     console.error("Error adding document: ", e);
   }
 }
 
 export const getQuiz = (dispatch:AppDispatch) => {
-  const unsubscribe = onSnapshot(doc(db, "quiz", "start"), (doc) => {
-    console.log("firestore-getQuiz", doc.data());
-    dispatch(getAskQuiz(doc.data()))
+  const q = query(collection(db, "quiz"), where("time", ">", Date.now()));
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      if (change.type === "added") {
+        console.log("New quiz: ", change.doc.data());
+        dispatch(getAskQuiz(change.doc.data()))
+      }
+    });
   });
   return  unsubscribe;
 }
