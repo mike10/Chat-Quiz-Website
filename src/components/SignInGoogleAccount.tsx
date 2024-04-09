@@ -1,5 +1,5 @@
 'use client'
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, getAdditionalUserInfo } from "firebase/auth";
 import { useSelector, useDispatch } from "react-redux";
 import {auth} from '@/utils/firestore'
 import styled from "styled-components";
@@ -7,6 +7,7 @@ import {addUserToChat} from '@/utils/firestore'
 import { useRouter } from 'next/navigation'
 import { getAllMessages } from "@/redux/sliceChat";
 import { setUser } from "@/redux/sliceUsers";
+import { useEffect } from "react";
 
 
 const SignInGoogleAccount = () => {
@@ -35,8 +36,14 @@ const SignInGoogleAccount = () => {
           token = credential.accessToken;
         // The signed-in user info.
         const user = result.user;
-        // IdP data available using getAdditionalUserInfo(result)
-        // ...
+        const user1 = getAdditionalUserInfo(result)
+        // console.log('user', user);
+        // console.log('result', result);
+        // console.log('token', token);
+        // console.log('credential', credential);
+        // console.log('provider', provider);
+
+        localStorage.setItem('user', user.displayName);
         console.log(user.displayName);
         if (user.displayName){
           //addUserToChat(user.displayName)

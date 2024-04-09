@@ -8,8 +8,11 @@ import { getAllUsers } from '@/redux/sliceUsers'
 import { getAskQuiz, setAskQuiz } from '@/redux/sliceQuiz'
 import {AppDispatch} from '@/redux/store'
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+
+
+// let url = 'firebaseConfig.json';
+// let response = await fetch(url);
+// let firebaseConfig = await response.json(); 
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -19,9 +22,10 @@ const firebaseConfig = {
   storageBucket: "chat-quiz-website-8a483.appspot.com",
   messagingSenderId: "583638170837",
   appId: "1:583638170837:web:cf5d6b36d313a9799b365c"
-};
+}; 
 
 // Initialize Firebase
+
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
@@ -121,7 +125,7 @@ export const addUserToChat = async (newUser:string) => {
 }
 
 export const getQuiz = (dispatch:AppDispatch) => {
-  const q = query(collection(db, "quiz")/* , where("time", ">", Date.now()) */);
+  const q = query(collection(db, "quiz"), where("time", ">", Date.now()));
   const unsubscribe = onSnapshot(q, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
       console.log("New quiz: ", change.doc.data());
