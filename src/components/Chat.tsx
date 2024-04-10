@@ -10,6 +10,7 @@ import IInitForChat from '@/utils/constants'
 import ReadyForQuiz from "./ReadyForQuiz";
 import Message from "./Message";
 import styled from "styled-components";
+import { setUser } from "@/redux/sliceUsers";
 const { TextArea } = Input;
 
 const Chat: React.FC = () => {
@@ -26,6 +27,11 @@ const Chat: React.FC = () => {
   }, [quiz]);
 
   useEffect(()=>{
+    if(!user){
+      const user = localStorage.getItem('user')
+      dispatch(setUser(user))
+    }
+    
     const unscribe1 = getMessagesFromChat(dispatch)
     const unscribe2 = getUsers(dispatch)
     const unscribe3 = getQuiz(dispatch)
