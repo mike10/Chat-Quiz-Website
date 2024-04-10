@@ -121,7 +121,7 @@ export const addUserToChat = async (newUser:string) => {
 }
 
 export const getQuiz = (dispatch:AppDispatch) => {
-  const q = query(collection(db, "quiz")/* , where("time", ">", Date.now()) */);
+  const q = query(collection(db, "quiz"), where("time", ">", Date.now()));
   const unsubscribe = onSnapshot(q, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
       console.log("New quiz: ", change.doc.data());
