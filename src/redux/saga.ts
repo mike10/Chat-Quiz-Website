@@ -1,9 +1,9 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
-import { getAllMessages, setMessageToChat, getMessagesToChat } from "@/redux/sliceChat";
+import { getMessagesToChat } from "@/redux/sliceChat";
 import { setUser } from "@/redux/sliceUsers";
 import { getAskQuiz, setAskQuiz } from  "@/redux/sliceQuiz"
-import { getAllMessages as getAllMessagesFirestore, addNewMessage, addUserToChat, setQuiz }  from '@/utils/firestore';
-import IInitForChat from '@/utils/constants'
+import { addNewMessage, addUserToChat, sendResult, setQuiz }  from '@/utils/firestore';
+import IInitForChat, { ISendResult } from '@/utils/constants'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 
@@ -14,11 +14,12 @@ export default function* rootSaga() {
 
 function* watchClickSaga() {
   //yield takeEvery(getAllMessages, fetchAllMessages)
-  yield takeEvery(setMessageToChat, workerMessageToChat)
+  yield takeEvery('setMessageToChat', workerMessageToChat)
   yield takeEvery(getMessagesToChat, workerGetMessageToChat)
   yield takeEvery(setUser, workerSetUser)
-  yield takeEvery(setAskQuiz, workerSetAskQuiz)
+  yield takeEvery('setAskQuiz', workerSetAskQuiz)
   yield takeEvery(getAskQuiz, workerGetAskQuiz)
+  yield takeEvery('SEND_RESULT', workerSendResult)
 }
 
 function* fetchAllMessages(){
@@ -43,13 +44,21 @@ export function* workerGetMessageToChat(obj:IInitForChat) {
   yield
 }
 
-export function* workerSetAskQuiz() {
-  setQuiz()
+export function* workerSetAskQuiz(data:PayloadAction<{type:string, payload: string }>) {
+   console.log('workerSetAskQuiz-data',data);
+   
+  setQuiz(data.payload)
   //put({ type: 'quiz/addAskQuiz'})
   yield
 }
 
 export function* workerGetAskQuiz() {
   console.log('workerGetAskQuiz');
+  yield
+}
+
+export function* workerSendResult(data:PayloadAction<{type:string, payload:ISendResult}>) {
+  console.log('workerGetAskQuiz');
+  sendResult(data.payload)
   yield
 }

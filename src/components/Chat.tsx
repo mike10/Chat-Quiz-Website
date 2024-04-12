@@ -1,29 +1,28 @@
 'use client'
 import { useSelector, useDispatch } from "react-redux";
-import {setMessageToChat} from '@/redux/sliceChat'
-import { setAskQuiz } from  "@/redux/sliceQuiz"
+import { getUseSelectorQuiz } from  "@/redux/sliceQuiz"
 import { Button, Divider, Flex } from "antd";
 import { Input } from 'antd';
 import {getMessagesFromChat, getUsers, getQuiz, quitUser} from '@/utils/firestore'
-import { FunctionComponent, ReactElement, ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import IInitForChat from '@/utils/constants'
+import { useEffect, useRef, useState } from "react";
+import IInitForChat, { IQuestions } from '@/utils/constants'
 import ReadyForQuiz from "./ReadyForQuiz";
 import Message from "./Message";
-import styled from "styled-components";
-import { setUser } from "@/redux/sliceUsers";
+import { getUser, setUser } from "@/redux/sliceUsers";
+import { getChat } from "@/redux/sliceChat";
 const { TextArea } = Input;
 
 const Chat: React.FC = () => {
-  const messages = useSelector(store => store?.chat);
-  const user = useSelector(store => store?.users?.user);
-  const quiz = useSelector(store => store?.quiz);
+  const messages = useSelector(getChat);
+  const user = useSelector(getUser);
+  const quiz:IQuestions[] | undefined = useSelector(getUseSelectorQuiz);
   const dispatch = useDispatch();
   const [message, setMessage] = useState('')
-  const [isQuiz, setIsQuiz] = useState()
-  const ref = useRef(null);
+  const [isQuiz, setIsQuiz] = useState<boolean>(false)
+  const ref = useRef();
 
-  useMemo(() => {
-    console.log('useMemo quiz', quiz, isQuiz);
+  useEffect(() => {
+    
   }, [quiz]);
 
   useEffect(()=>{
@@ -38,13 +37,15 @@ const Chat: React.FC = () => {
     return () => {
       unscribe1()
       unscribe2()
-      //unscribe3()
+      unscribe3()
       quitUser(user)
     };
   }, []) 
   
   useEffect(()=>{
-    ref.current.scrollTop = ref.current.scrollHeight
+    if(ref.current){
+      ref.current.scrollTop = ref.current.scrollHeight
+    }
   }, [messages])   
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -52,11 +53,12 @@ const Chat: React.FC = () => {
   };
 
   const handleMessage = () => {
-    if(message) dispatch(setMessageToChat({user, message}))
+    if(message) dispatch({type:'setMessageToChat', payload:{user, message}})
   }
 
   const handleQuiz = () => {
-    dispatch(setAskQuiz())
+    //dispatch(setAskQuiz({user}))
+    dispatch({type: 'setAskQuiz', payload: user})
   }
 
   return (
@@ -75,8 +77,9 @@ const Chat: React.FC = () => {
         >
           
           {messages.map((item: IInitForChat, index: number) => <Message {...item} />)}
-          {quiz ? <ReadyForQuiz/> : null}
+          {quiz ? <ReadyForQuiz/> : ''}
         </div>
+        
         <TextArea
           placeholder="input your message"
           allowClear

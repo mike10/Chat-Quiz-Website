@@ -2,7 +2,6 @@ import IInitForChat from '@/utils/constants'
 
 const Message = (props:IInitForChat) => {
     const time = new Date(props.time)
-    console.log('Message',  props);
     
     return (
         <div key={time}>

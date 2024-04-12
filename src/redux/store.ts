@@ -19,6 +19,8 @@ export const store = configureStore({
   })
 
   sagaMiddleware.run(rootSaga)
+
+
   
   // Infer the type of makeStore
   export type RootState = ReturnType<typeof store.getState>

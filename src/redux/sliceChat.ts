@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
-//import type { RootState } from '../../app/store'
 import IInitForChat from '@/utils/constants' 
+import { RootState } from './store';
 
 
 // Define the initial state using that type
@@ -11,18 +10,14 @@ export const sliceChat = createSlice({
   name: 'chat',
   initialState,
   reducers: {
-    getAllMessages: (state) => {
-      
-    },
     getMessagesToChat: (state, PayloadAction) => {
       state.push(PayloadAction.payload);
     },
-    setMessageToChat: (state, PayloadAction) => {
-      //console.log(PayloadAction.payload);
-    }
   },
 })
 
-export const { getAllMessages, getMessagesToChat, setMessageToChat } = sliceChat.actions
+export const { getMessagesToChat } = sliceChat.actions
+
+export const getChat = (store:RootState) => store.chat
 
 export default sliceChat.reducer

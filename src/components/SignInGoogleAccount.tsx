@@ -5,7 +5,6 @@ import {auth} from '@/utils/firestore'
 import styled from "styled-components";
 import {addUserToChat} from '@/utils/firestore'
 import { useRouter } from 'next/navigation'
-import { getAllMessages } from "@/redux/sliceChat";
 import { setUser } from "@/redux/sliceUsers";
 import { useEffect } from "react";
 
@@ -48,7 +47,7 @@ const SignInGoogleAccount = () => {
         if (user.displayName){
           //addUserToChat(user.displayName)
           router.push('/main')
-          dispatch(getAllMessages())
+          //dispatch(getAllMessages())
           dispatch(setUser(user.displayName))
         }
           

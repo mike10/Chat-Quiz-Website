@@ -1,31 +1,31 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 //import type { RootState } from '../../app/store'
-import IInitForChat from '@/utils/constants' 
+import IInitForChat, { IQuiz } from '@/utils/constants' 
+import { useSelector } from 'react-redux'
+import { RootState } from './store'
 
 
 // Define the initial state using that type
-const initialState: boolean = false
+const initialState: IQuiz = {
+  name: '',
+  time: 0,
+  user: ''
+}
 
 export const sliceQuiz = createSlice({
   name: 'quiz',
   initialState,
   reducers: {
-    setAskQuiz: (state) => {
-      return state;
-    },
     getAskQuiz:(state, PayloadAction) => {
-      //console.log('getAskQuiz',PayloadAction.payload);
-      console.log(state);
-      return true
+      return PayloadAction.payload
     },
-    sendAnswerCancel: () => {
-      return false
-    },
-   
   },
 })
 
-export const { setAskQuiz, sendAnswerCancel, getAskQuiz } = sliceQuiz.actions
+export const getUseSelectorQuiz = (store:RootState) => store.quiz.quiz
+export const getQuizResult = (store:RootState) => store.quiz.quizResult 
+
+export const { getAskQuiz } = sliceQuiz.actions
 
 export default sliceQuiz.reducer

@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import IInitForChat, {ISendMessage} from '@/utils/constants'
-import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, arrayUnion, onSnapshot, getDoc, query, where, getDocs, arrayRemove } from "firebase/firestore";
+import IInitForChat, {ISendMessage, ISendResult} from '@/utils/constants'
+import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, arrayUnion, onSnapshot, getDoc, query, where, getDocs, arrayRemove, deleteField } from "firebase/firestore";
 import { getMessagesToChat } from '@/redux/sliceChat'
 import { getAllUsers } from '@/redux/sliceUsers'
 import { getAskQuiz, setAskQuiz } from '@/redux/sliceQuiz'
@@ -30,55 +30,6 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-
-/* export const getAllMessages = async () => {
-  try {
-    const q = query(collection(db, "chat"), where("time", ">", Date.now()-30*60*1000));
-    console.log('firestore getAllMessage');
-    
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      console.log(doc.id, " => ", doc.data());
-    });
-  } catch (e) {
-    console.error("<getAllUsers> Error adding document: ", e);
-  }
-} */
-
-/* export const getAllUsers = async () => {
-  try {
-    const docRef = doc(db, "users", "default");
-    const docSnap = await getDoc(docRef);
-    
-    if (docSnap.exists()) {
-      console.log("Document data:", docSnap.data());
-    } else {
-      // docSnap.data() will be undefined in this case
-      console.log("No such document!");
-    }
-  } catch (e) {
-    console.error("<getAllUsers> Error adding document: ", e);
-  }
-} */
-
-
-
-export const addNewMessage = async ({user, message}:ISendMessage) => {
-  try {
-    const time:number = Date.now()
-    const docData = {
-      user,
-      message,
-      time
-    }
-    await setDoc(doc(db, "chat", `id${time}`), docData);
-    //console.log("Document written with ID: ", docRef.id);
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
-}
-
 export const  getMessagesFromChat = (dispatch:AppDispatch)=>{
   const q = query(collection(db, "chat"), where("time", ">", Date.now()-30*60*1000));
   const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -99,6 +50,38 @@ export const getUsers = (dispatch:AppDispatch) => {
   });
   return ()=>{
     unsubscribe()
+  }
+}
+
+export const getQuiz = (dispatch:AppDispatch) => {
+  //const q = query(collection(db, "quiz"), where("time", ">", Date.now()));
+  const unsubscribe = onSnapshot(doc(db, "quiz", "start"), (doc) => {
+    console.log(doc.data());
+    if (!doc.exists()) throw new Error('No data available');
+    else {
+      if (doc.data().time < Date.now()-10*1000) {
+        const { user, time, name } = doc.data();
+        dispatch(getAskQuiz({ user, time, name }))
+      }else {
+        dispatch(getAskQuiz(doc.data()))
+      }
+    }
+  });
+  return  unsubscribe;
+}
+
+export const addNewMessage = async ({user, message}:ISendMessage) => {
+  try {
+    const time:number = Date.now()
+    const docData:IInitForChat = {
+      user,
+      message,
+      time
+    }
+    await setDoc(doc(db, "chat", `id${time}`), docData);
+    //console.log("Document written with ID: ", docRef.id);
+  } catch (e) {
+    console.error("Error adding document: ", e);
   }
 }
 
@@ -124,22 +107,38 @@ export const addUserToChat = async (newUser:string) => {
   }
 }
 
-export const getQuiz = (dispatch:AppDispatch) => {
-  const q = query(collection(db, "quiz"), where("time", ">", Date.now()));
-  const unsubscribe = onSnapshot(q, (snapshot) => {
-    snapshot.docChanges().forEach((change) => {
-      console.log("New quiz: ", change.doc.data());
-      dispatch(getAskQuiz(change.doc.data()))
-    });
+export const sendResult = async (data:ISendResult) => {
+  try {
+    const quizRef = doc(db, "quiz", "start");
+    //await setDoc(doc(db, "quiz", "start"), quizRef);
+    //setDoc(quizRef, { quizResult: arrayUnion(data) });
+    await updateDoc(quizRef, {
+      quizResult: arrayUnion(data)
   });
-  return  unsubscribe;
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
 }
 
-export const setQuiz = async () => {
+export const setQuiz = async (user:string) => {
   const time:number = Date.now()
   await setDoc(doc(db, "quiz", "start"), {
     name: "quiz",
     time,
-    user: ""
+    user,
+    quiz: [
+      {q:'q1', a1:'a1', a2: 'a2', a3: 'a3', a4:'a4', r: 2},
+      {q:'q2', a1:'a1', a2: 'a2', a3: 'a3', a4:'a4', r: 1},
+      {q:'q3', a1:'a1', a2: 'a2', a3: 'a3', a4:'a4', r: 4},
+      {q:'q4', a1:'a1', a2: 'a2', a3: 'a3', a4:'a4', r: 3},
+      {q:'q5', a1:'a1', a2: 'a2', a3: 'a3', a4:'a4', r: 1}  
+    ]
+  });
+
+  const quizRef = doc(db, "quiz", "start");
+  await updateDoc(quizRef, {
+    quizResult: deleteField()
   });
 }
+
+
