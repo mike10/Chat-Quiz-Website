@@ -1,5 +1,5 @@
 'use client'
-import { getAuth, signInWithPopup, GoogleAuthProvider, getAdditionalUserInfo } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, getAdditionalUserInfo, OAuthCredential } from "firebase/auth";
 import { useSelector, useDispatch } from "react-redux";
 import {auth} from '@/utils/firestore'
 import styled from "styled-components";
@@ -29,29 +29,18 @@ const SignInGoogleAccount = () => {
       const provider = await new GoogleAuthProvider();
       signInWithPopup(auth, provider).then((result) => {
         // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        let token
-        if(credential != null)
-          token = credential.accessToken;
+        const credential: OAuthCredential | null = GoogleAuthProvider.credentialFromResult(result);
+        if(!credential) throw 'Can´t get connect with Google'
+        let token = credential.accessToken;
         // The signed-in user info.
         const user = result.user;
-        const user1 = getAdditionalUserInfo(result)
-        // console.log('user', user);
-        // console.log('result', result);
-        // console.log('token', token);
-        // console.log('credential', credential);
-        // console.log('provider', provider);
-
-        localStorage.setItem('user', user.displayName);
-        console.log(user.displayName);
         if (user.displayName){
           //addUserToChat(user.displayName)
+          localStorage.setItem('user', user.displayName);
           router.push('/main')
           //dispatch(getAllMessages())
           dispatch(setUser(user.displayName))
         }
-          
-        
       }).catch((error) => {
         // Handle Errors here.
         const errorCode = error.code;

@@ -29,6 +29,7 @@ const ReadyForQuiz: React.FC = () => {
   const handleCancleQuiz = () => {
     //dispatch(sendAnswerCancel())
     //setDisabledButton('disabled')
+    setShowForm('showNothing')
   }
 
   const handleOkQuiz = () => {
@@ -57,16 +58,23 @@ const ReadyForQuiz: React.FC = () => {
       ) : null}
 
       {showForm === "showPlay" ? (
-        <div /* className={stateForm?.showPlay} */>
+        <div >
           <PlayToQuiz />
         </div>
       ) : null}
 
       {showForm === "showResult"  && quizResult !== undefined ? (
-        <div /* className={stateForm?.showPlay} */>
-          {quizResult}
+        <div >
+          {quizResult.map((item,index)=>{
+            return <div key={index}>
+              <p>{item.user}</p>
+              <div>{`scored ${item.rightAnswer} points`}</div>
+              <Button onClick={handleCancleQuiz}>Ok</Button>
+            </div>
+          })}
         </div>
       ) : null}
+      {showForm === "showResult" ? null : null}  
     </Flex>
   );
 };

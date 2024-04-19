@@ -1,11 +1,11 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { GoogleAuthProvider, OAuthCredential, User, UserCredential, getAuth, getRedirectResult } from "firebase/auth";
 import IInitForChat, {ISendMessage, ISendResult} from '@/utils/constants'
 import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, arrayUnion, onSnapshot, getDoc, query, where, getDocs, arrayRemove, deleteField } from "firebase/firestore";
 import { getMessagesToChat } from '@/redux/sliceChat'
 import { getAllUsers } from '@/redux/sliceUsers'
-import { getAskQuiz, setAskQuiz } from '@/redux/sliceQuiz'
+import { getAskQuiz } from '@/redux/sliceQuiz'
 import {AppDispatch} from '@/redux/store'
 
 
@@ -28,7 +28,36 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+const db = getFirestore(app);
+
+export const reloadToken = async () => {
+  
+  console.log(auth);
+  
+  const res:User | null = await getRedirectResult(auth)
+  .then((result) => {
+    // This gives you a Google Access Token. You can use it to access Google APIs.
+    console.log('reloadToken',result);
+    
+    const credential: OAuthCredential | null = GoogleAuthProvider.credentialFromResult(result);
+    if(!credential || !result) throw 'Can´t get token of Google'
+    // const token = credential.accessToken;
+    // const user = result.user;
+    console.log(result.user);
+    
+    return result.user
+  }).catch((error) => {
+    // Handle Errors here.
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // The email of the user's account used.
+    const email = error.customData.email;
+    // The AuthCredential type that was used.
+    const credential = GoogleAuthProvider.credentialFromError(error);
+    return null
+  });
+  
+}
 
 export const  getMessagesFromChat = (dispatch:AppDispatch)=>{
   const q = query(collection(db, "chat"), where("time", ">", Date.now()-30*60*1000));
@@ -59,7 +88,7 @@ export const getQuiz = (dispatch:AppDispatch) => {
     console.log(doc.data());
     if (!doc.exists()) throw new Error('No data available');
     else {
-      if (doc.data().time < Date.now()-10*1000) {
+      if (doc.data().time < Date.now()-60*1000) {
         const { user, time, name } = doc.data();
         dispatch(getAskQuiz({ user, time, name }))
       }else {
@@ -127,11 +156,11 @@ export const setQuiz = async (user:string) => {
     time,
     user,
     quiz: [
-      {q:'q1', a1:'a1', a2: 'a2', a3: 'a3', a4:'a4', r: 2},
-      {q:'q2', a1:'a1', a2: 'a2', a3: 'a3', a4:'a4', r: 1},
-      {q:'q3', a1:'a1', a2: 'a2', a3: 'a3', a4:'a4', r: 4},
-      {q:'q4', a1:'a1', a2: 'a2', a3: 'a3', a4:'a4', r: 3},
-      {q:'q5', a1:'a1', a2: 'a2', a3: 'a3', a4:'a4', r: 1}  
+      {q:'Question 1', a1:'Answer 1', a2: 'Answer 2', a3: 'Answer 3', a4:'Answer 4', r: 2},
+      {q:'Question 2', a1:'Answer 1', a2: 'Answer 2', a3: 'Answer 3', a4:'Answer 4', r: 1},
+      {q:'Question 3', a1:'Answer 1', a2: 'Answer 2', a3: 'Answer 3', a4:'Answer 4', r: 4},
+      {q:'Question 4', a1:'Answer 1', a2: 'Answer 2', a3: 'Answer 3', a4:'Answer 4', r: 3},
+      {q:'Question 5', a1:'Answer 1', a2: 'Answer 2', a3: 'Answer 3', a4:'Answer 4', r: 1}  
     ]
   });
 
