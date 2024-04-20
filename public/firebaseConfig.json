@@ -1,0 +1,10 @@
+{
+    "firebaseConfig" : {
+        "apiKey": "AIzaSyC8RZZFKAbNx5G1L1kf5dteSTXbBXFgkOs",
+        "authDomain": "chat-quiz-website-8a483.firebaseapp.com",
+        "projectId": "chat-quiz-website-8a483",
+        "storageBucket": "chat-quiz-website-8a483.appspot.com",
+        "messagingSenderId": "583638170837",
+        "appId": "1:583638170837:web:cf5d6b36d313a9799b365c"
+  }
+}
