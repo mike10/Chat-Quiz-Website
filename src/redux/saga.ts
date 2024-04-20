@@ -1,7 +1,5 @@
-import { call, put, takeEvery } from 'redux-saga/effects';
-import { getMessagesToChat } from "@/redux/sliceChat";
+import { put, takeEvery } from 'redux-saga/effects';
 import { setUser } from "@/redux/sliceUsers";
-import { getAskQuiz, setAskQuiz } from  "@/redux/sliceQuiz"
 import { addNewMessage, addUserToChat, reloadToken, sendResult, setQuiz }  from '@/utils/firestore';
 import IInitForChat, { ISendMessage, ISendResult } from '@/utils/constants'
 import type { PayloadAction } from '@reduxjs/toolkit'

@@ -38,7 +38,7 @@ export const reloadToken = async () => {
   .then((result) => {
     // This gives you a Google Access Token. You can use it to access Google APIs.
     console.log('reloadToken',result);
-    
+    if(!result) throw 'Can´t get token of Google'
     const credential: OAuthCredential | null = GoogleAuthProvider.credentialFromResult(result);
     if(!credential || !result) throw 'Can´t get token of Google'
     // const token = credential.accessToken;
