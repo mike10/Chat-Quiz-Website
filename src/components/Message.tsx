@@ -4,7 +4,7 @@ const Message = (props:IInitForChat) => {
     const time = new Date(props.time)
     
     return (
-        <div key={time}>
+        <div /* key={time} */>
             <p>
                 <span className="text-xs bg-lime-700 rounded px-1">{props.user}</span>
                 <span style={{fontSize: '8px', backgroundColor: '#EDAAC0', color: '#fff', borderRadius: '4px', padding: '1px 5px', lineHeight: '100%'}}>

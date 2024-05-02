@@ -17,8 +17,11 @@ export interface IQuiz {
     name:string,
     time:number,
     user:string,
-    quiz?:IQuestions[],
-    quizResult?:ISendResult[]
+    isPlay: boolean,
+    isReadyQuizResult: false,
+    quizResult:ISendResult[],
+    questions:IQuestions[],
+    
 }
 
 export interface IQuestions {

@@ -10,7 +10,11 @@ import { RootState } from './store'
 const initialState: IQuiz = {
   name: '',
   time: 0,
-  user: ''
+  user: '',
+  isPlay: false,
+  isReadyQuizResult: false,
+  quizResult: [],
+  questions:[],
 }
 
 export const sliceQuiz = createSlice({
@@ -18,14 +22,28 @@ export const sliceQuiz = createSlice({
   initialState,
   reducers: {
     getAskQuiz:(state, PayloadAction) => {
-      return PayloadAction.payload
+      console.log('getAskQuiz', PayloadAction);
+      return {...state, ...PayloadAction.payload, isPlay:true}
+    },
+    setPlayToQuiz:(state, PayloadAction) => {
+      state.isPlay = PayloadAction.payload;
+    },
+    setReadyQuizResult:(state, PayloadAction) => {
+      state.isReadyQuizResult=PayloadAction.payload;
+    },
+    setQuizResult:(state, PayloadAction) => {
+      console.log(PayloadAction.payload);
+      state.quizResult.push(PayloadAction.payload);
     },
   },
 })
 
-export const getUseSelectorQuiz = (store:RootState) => store.quiz.quiz
-export const getQuizResult = (store:RootState) => store.quiz.quizResult 
+export const getSelectorQuizName = (store:RootState) => store.quiz.name
+export const getSelectorQuizIsPlay = (store:RootState) => store.quiz.isPlay 
+export const getSelectorIsReadyQuizResult  = (store:RootState) => store.quiz.isReadyQuizResult
+export const getSelectorQuizResult = (store:RootState) => store.quiz.quizResult
+export const getSelectorQuizQuestions = (store:RootState) => store.quiz.questions
 
-export const { getAskQuiz } = sliceQuiz.actions
+export const { getAskQuiz, setPlayToQuiz, setQuizResult, setReadyQuizResult } = sliceQuiz.actions
 
 export default sliceQuiz.reducer

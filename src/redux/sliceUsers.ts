@@ -7,7 +7,8 @@ import { RootState } from './store'
 // Define the initial state using that type
 const initialState:IInitForUsers = {
   user: '',
-  users: []
+  users: [],
+  
 }
 
 export const sliceUsers = createSlice({
@@ -17,17 +18,18 @@ export const sliceUsers = createSlice({
     setUser: (state, PayloadAction) => {
       state.user = PayloadAction.payload;
     },
-    getAllUsers: (state, PayloadAction ) => {
-      state.users = PayloadAction.payload;
+    addUser: (state, PayloadAction ) => {
+      state.users.push(PayloadAction.payload);
+    },
+    removeUser: (state, PayloadAction ) => {
+      const index = state.users.indexOf(PayloadAction.payload)
+      state.users.splice(index, 1)
     },
   },
 })
 
-export const { setUser, getAllUsers } = sliceUsers.actions
+export const { setUser, addUser, removeUser } = sliceUsers.actions
 
-export const getUser = (store:RootState) => store.users.user
-
-// Other code such as selectors can use the imported `RootState` type
-//export const selectCount = (state: RootState) => state.counter.value
+export const getSelectorUser = (store:RootState) => store.users.user
 
 export default sliceUsers.reducer

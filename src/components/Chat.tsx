@@ -1,26 +1,25 @@
 'use client'
+import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUseSelectorQuiz } from  "@/redux/sliceQuiz"
-import { Button, Divider, Flex } from "antd";
-import { Input } from 'antd';
-import {getMessagesFromChat, getUsers, getQuiz, quitUser, reloadToken} from '@/utils/firestore'
-import { LegacyRef, MutableRefObject, RefObject, useEffect, useRef, useState } from "react";
-import IInitForChat, { IQuestions } from '@/utils/constants'
+import { Button, Divider, Flex, Input } from "antd";
+import {getMessagesFromChat, getUsers, getQuiz, quitUser, userAuth} from '@/utils/firestore'
+import IInitForChat from '@/utils/constants'
 import ReadyForQuiz from "./ReadyForQuiz";
 import Message from "./Message";
-import { getUser, setUser } from "@/redux/sliceUsers";
+import { getSelectorUser } from "@/redux/sliceUsers";
 import { getChat } from "@/redux/sliceChat";
-import { GoogleAuthProvider, OAuthCredential, User, UserInfo, getAuth, getRedirectResult, inMemoryPersistence, onAuthStateChanged, setPersistence, signInWithRedirect } from "firebase/auth";
+import { getSelectorQuizIsPlay } from  "@/redux/sliceQuiz"
 const { TextArea } = Input;
 
 const Chat: React.FC = () => {
-  const messages = useSelector(getChat);
-  const user = useSelector(getUser);
-  const quiz:IQuestions[] | undefined = useSelector(getUseSelectorQuiz);
+  const messages:IInitForChat[] = useSelector(getChat);
+  const user:string = useSelector(getSelectorUser);
+  //const quiz:string = useSelector(getSelectorQuizName);
+  const isPlayQuiz:boolean = useSelector(getSelectorQuizIsPlay);
   const dispatch = useDispatch();
   const [message, setMessage] = useState('')
-  const [isQuiz, setIsQuiz] = useState<boolean>(false)
-  const ref= useRef<HTMLDivElement>(null);
+  //const [isQuiz, setIsQuiz] = useState<boolean>(false)
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(()=>{
     const unscribe1 = getMessagesFromChat(dispatch)
@@ -28,7 +27,7 @@ const Chat: React.FC = () => {
     const unscribe3 = getQuiz(dispatch)
     return () => {
       unscribe1()
-      //unscribe2()
+      unscribe2()
       unscribe3()
       quitUser(user)
     };
@@ -36,17 +35,8 @@ const Chat: React.FC = () => {
   
   useEffect(() => {
     if (!user) {
-      const auth = getAuth();
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          dispatch(setUser(user.displayName))
-        } else {
-          throw 'connecting was lost'
-        }
-      });
-      
+      userAuth(dispatch)
     }
-      //dispatch({type:'RELOAD'}) 
   }, [user]);
   
   useEffect(()=>{
@@ -60,12 +50,16 @@ const Chat: React.FC = () => {
   };
 
   const handleMessage = () => {
+    if(!user) {
+      userAuth(dispatch)
+      return alert('Auth was lost')
+    }   
     if(message) dispatch({type:'SEND_MESSAGE_TO_CHAT', payload:{user, message}})
   }
 
   const handleQuiz = () => {
-    //dispatch(setAskQuiz({user}))
-    dispatch({type: 'ASK_ABOUT_QUIZ', payload: user})
+    if(!isPlayQuiz)
+      dispatch({type: 'ASK_ABOUT_QUIZ', payload: user})
   }
 
   return (
@@ -83,8 +77,8 @@ const Chat: React.FC = () => {
           style={{ width: "100%", height: "500px", overflow: "scroll" }}
         >
           
-          {messages.map((item: IInitForChat, index: number) => <Message {...item} />)}
-          {quiz ? <ReadyForQuiz/> : ''}
+          {messages.map((item: IInitForChat, index: number) => <Message {...item} key={index}/>)}
+          {isPlayQuiz ? <ReadyForQuiz/> : ''}
         </div>
         
         <TextArea

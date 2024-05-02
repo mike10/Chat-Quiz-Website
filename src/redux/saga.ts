@@ -1,9 +1,10 @@
-import { put, takeEvery } from 'redux-saga/effects';
+import { call, put, takeEvery } from 'redux-saga/effects';
 import { setUser } from "@/redux/sliceUsers";
-import { addNewMessage, addUserToChat, reloadToken, sendResult, setQuiz }  from '@/utils/firestore';
+import { addNewMessage, addUserToChat, sendResult, setQuiz }  from '@/utils/firestore';
 import IInitForChat, { ISendMessage, ISendResult } from '@/utils/constants'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { User } from 'firebase/auth';
+import { setPlayToQuiz, setReadyQuizResult } from './sliceQuiz';
 
 
 export default function* rootSaga() {
@@ -11,54 +12,34 @@ export default function* rootSaga() {
 }
 
 function* watchClickSaga() {
+  yield takeEvery('AUTH_USER', workerAuthUser)
   yield takeEvery('SEND_MESSAGE_TO_CHAT', workerMessageToChat)
-  //yield takeEvery(getMessagesToChat, workerGetMessageToChat)
-  yield takeEvery(setUser, workerSetUser)
   yield takeEvery('ASK_ABOUT_QUIZ', workerSetAskQuiz)
-  //yield takeEvery(getAskQuiz, workerGetAskQuiz)
-  yield takeEvery('RELOAD', workerReload)
   yield takeEvery('SEND_RESULT', workerSendResult)
 }
 
+function* workerAuthUser(data:PayloadAction<string, string>){
+  addUserToChat(data.payload)
+  yield put({type: 'users/setUser', payload: data.payload})
+}
+
 function* workerMessageToChat(data:PayloadAction<ISendMessage, string>) {
-  console.log('workerMessageToChat', data);
-  
   const {user, message} = data.payload
   yield addNewMessage({user, message})
 }
 
-export function* workerGetMessageToChat(obj:IInitForChat) {
-  //console.log(obj);
-  yield put({ type: 'getMessagesToChat', obj })
-}
-
- function* workerSetUser(data:PayloadAction<string, string>){
-  addUserToChat(data.payload)
-  put({ type: 'setUser', data })
-  yield
-}
-
 export function* workerSetAskQuiz(data:PayloadAction<string, string>) {
-   console.log('workerSetAskQuiz-data',data);
-   
-  setQuiz(data.payload)
-  //put({ type: 'quiz/addAskQuiz'})
-  yield
+  console.log('workerSetAskQuiz-data',data);
+  yield setQuiz(data.payload)
 }
 
-export function* workerGetAskQuiz() {
-  console.log('workerGetAskQuiz');
-  yield
-}
-
-export function* workerReload() {
-  const user:User | null = yield reloadToken()
-  yield console.log('workerReload', user);
-  
-}
+/* export function* workerGetMessageToChat(obj:IInitForChat) {
+  //console.log(obj);
+  //yield put({ type: 'getMessagesToChat', obj })
+} */
 
 export function* workerSendResult(data:PayloadAction<ISendResult, string>) {
-  console.log('workerGetAskQuiz');
-  sendResult(data.payload)
-  yield
+  yield put(setReadyQuizResult(true))
+  yield sendResult(data.payload)
+  
 }  

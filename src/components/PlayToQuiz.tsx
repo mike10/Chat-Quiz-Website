@@ -1,6 +1,6 @@
 'use client'
-import { getUseSelectorQuiz } from "@/redux/sliceQuiz";
-import { getUser } from "@/redux/sliceUsers";
+import { getSelectorQuizName, getSelectorQuizQuestions, setPlayToQuiz } from "@/redux/sliceQuiz";
+import { getSelectorUser } from "@/redux/sliceUsers";
 import { IQuestions } from "@/utils/constants";
 import { Button, Progress, Radio, RadioChangeEvent } from "antd";
 import { useEffect, useState } from "react";
@@ -11,12 +11,13 @@ const PlayToQuiz = () => {
   const [numQuestion, setNumQuestion] = useState(0)
   const [timer, setTimer] = useState<number>(0)
   const [stopTimer, setStopTimer] = useState<boolean>(true)
-  const quiz:IQuestions[] | undefined = useSelector(getUseSelectorQuiz);
-  const user:string = useSelector(getUser);
+  const [rightAnswer, setRightAnswer] = useState<number>(0)
+  const questions:IQuestions[] | undefined = useSelector(getSelectorQuizQuestions);
+  const user:string = useSelector(getSelectorUser);
   const dispatch = useDispatch();
-  let rightAnswer:number = 0
+ 
 
-  const onChange = (e: RadioChangeEvent) => {
+  const handleChange = (e: RadioChangeEvent) => {
     setValue(e.target.value);
   };
 
@@ -25,47 +26,45 @@ const PlayToQuiz = () => {
     if(timer < 100 && stopTimer) {
       timeId = setTimeout(setTimer, 1000, timer + 3.3)
     }
-    
+    if(timer > 100) {
+      handleOk()
+    }
     return  ()=>{clearTimeout(timeId)}
-  /* setTimeout (() => {
-      setTimer(timer + 3.3)
-      console.log(`timer ${timer} stopTimer ${stopTimer}`);
-      if(timer > 15) setStopTimer(true)
-      if(stopTimer) {
-        console.log('stopInterval');
-        clearInterval(saveInterval)
-      }
-    }, 1000) */
   }, [timer, stopTimer])
 
-  const handleOk = ()=>{
-    if (!quiz) throw 'No questions in the database';
 
+  const handleOk = ()=>{
+    if (!questions) console.log( 'No questions in the database');
+    
     setStopTimer(false)
 
-    if(value === quiz[numQuestion].r){
-      rightAnswer++
+    /* if(value === questions[numQuestion].r){
+      setRightAnswer(rightAnswer+1)
+     
+      console.log('rightAnswer', questions[numQuestion].r, value, rightAnswer);
     }
-    if(numQuestion+1 !== quiz.length) {
+    
+    if(numQuestion+1 !== questions.length) {
       setNumQuestion(numQuestion+1)
       setTimer(0)
       setStopTimer(true)
     }else{
       dispatch({type:'SEND_RESULT', payload:{rightAnswer, user}})
-    }
+    } */
+    
   }
 
-  if(!quiz) return (<div>Loading...</div>)
+  if(!questions) return (<div>Loading...</div>)
 
   return (
     <div>
-      <p>{quiz[numQuestion].q}</p>
+      <p>{questions[numQuestion].q}</p>
       <Progress percent={Math.round(timer)} />
-      <Radio.Group onChange={onChange} >
-        <Radio value={1}>{quiz[numQuestion].a1}</Radio>
-        <Radio value={2}>{quiz[numQuestion].a2}</Radio>
-        <Radio value={3}>{quiz[numQuestion].a3}</Radio>
-        <Radio value={4}>{quiz[numQuestion].a4}</Radio>
+      <Radio.Group onChange={handleChange} > 
+        <Radio value={1}>{questions[numQuestion].a1}</Radio>
+        <Radio value={2}>{questions[numQuestion].a2}</Radio>
+        <Radio value={3}>{questions[numQuestion].a3}</Radio>
+        <Radio value={4}>{questions[numQuestion].a4}</Radio>
       </Radio.Group>
       <Button onClick={handleOk}>Ok</Button>
     </div>

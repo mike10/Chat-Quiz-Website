@@ -1,6 +1,6 @@
 'use client'
 import { Button, Flex } from "antd";
-import { getQuizResult } from '@/redux/sliceQuiz'
+import { getSelectorIsReadyQuizResult, getSelectorQuizIsPlay, getSelectorQuizResult, setPlayToQuiz, setQuizResult, setReadyQuizResult } from '@/redux/sliceQuiz'
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useReducer, useState } from "react";
 import PlayToQuiz from "./PlayToQuiz";
@@ -9,32 +9,27 @@ import { ISendResult } from "@/utils/constants";
 const ReadyForQuiz: React.FC = () => {
   const dispatch = useDispatch()
   //const [disabledButton, setDisabledButton] = useState('')
-
-  const quizResult:ISendResult[] | undefined = useSelector(getQuizResult)
+  
+  //const isPlayQuiz:boolean = useSelector(getSelectorQuizIsPlay)
+  const isReadyQuizResult:boolean = useSelector(getSelectorIsReadyQuizResult)
+  const quizResult:ISendResult[] = useSelector(getSelectorQuizResult)
 
   const [showForm, setShowForm] = useState<string>('showChoise')
 
-  /* const [stateForm, setStateForm] = useReducer((state:{showChoise:string, showPlay:string}, action:{type:string, payload:{showChoise:string, showPlay:string}})=>{
-    switch (action.type){
-      case 'showChoise': return { showChoise:'block', showPlay: 'hidden'  }
-      case 'showPlay': return { showChoise:'hidden', showPlay:'block'  }
-      //case 'result': return { showChoise:'hidden', showPlay:'block'  }
-    }
-  }, { showChoise:'block', showPlay: 'hidden' }); */
-
   useEffect(()=>{
-    if(quizResult) setShowForm('showResult')
-  }, [quizResult])
+    if(isReadyQuizResult) setShowForm('showResult')
+  }, [isReadyQuizResult])
+
+  
 
   const handleCancleQuiz = () => {
-    //dispatch(sendAnswerCancel())
-    //setDisabledButton('disabled')
     setShowForm('showNothing')
+    dispatch(setPlayToQuiz(false))
+    dispatch(setReadyQuizResult(false))
   }
 
   const handleOkQuiz = () => {
-    //dispatch(sendAnswerCancel())
-    //setStateForm( { type : 'showPlay'} )
+    dispatch(setPlayToQuiz(true))
     setShowForm( 'showPlay' )
   }
 
@@ -49,32 +44,27 @@ const ReadyForQuiz: React.FC = () => {
         <div>
           <p>Would you like to take part in the quiz?</p>
           <Flex gap="small" wrap="wrap">
-            <Button type="primary" onClick={handleOkQuiz}>
-              Ok
-            </Button>
+            <Button type="primary" onClick={handleOkQuiz}>Ok</Button>
             <Button onClick={handleCancleQuiz}>Cancel</Button>
           </Flex>
         </div>
       ) : null}
 
-      {showForm === "showPlay" ? (
-        <div >
-          <PlayToQuiz />
-        </div>
-      ) : null}
+      {showForm === "showPlay" ? <PlayToQuiz />  : null}
 
-      {showForm === "showResult"  && quizResult !== undefined ? (
+      {showForm === "showResult" /*  && quizResult !== undefined */ ? (
         <div >
-          {quizResult.map((item,index)=>{
+          {quizResult.map((item, index)=>{
             return <div key={index}>
               <p>{item.user}</p>
               <div>{`scored ${item.rightAnswer} points`}</div>
-              <Button onClick={handleCancleQuiz}>Ok</Button>
+              
             </div>
           })}
+          <Button onClick={handleCancleQuiz}>Ok</Button>
         </div>
       ) : null}
-      {showForm === "showResult" ? null : null}  
+      {/* {showForm === "showResult" ? null : null}  */} 
     </Flex>
   );
 };

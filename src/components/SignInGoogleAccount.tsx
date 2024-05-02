@@ -1,18 +1,17 @@
 'use client'
-import { getAuth, signInWithPopup, GoogleAuthProvider, getAdditionalUserInfo, OAuthCredential } from "firebase/auth";
-import { useSelector, useDispatch } from "react-redux";
-import {auth} from '@/utils/firestore'
+import { signInWithPopup, GoogleAuthProvider, OAuthCredential, getAuth } from "firebase/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { userAuth, userSign} from '@/utils/firestore'
 import styled from "styled-components";
-import {addUserToChat} from '@/utils/firestore'
 import { useRouter } from 'next/navigation'
-import { setUser } from "@/redux/sliceUsers";
+import { getSelectorUser, setUser } from "@/redux/sliceUsers";
 import { useEffect } from "react";
 
 
 const SignInGoogleAccount = () => {
 
+  const user = useSelector(getSelectorUser);
   const dispatch = useDispatch();
-
   const router = useRouter()
 
   const Button = styled.button`
@@ -25,33 +24,16 @@ const SignInGoogleAccount = () => {
       border-radius: 10px;
       `;
 
+  useEffect(() => {
+    const auth = getAuth()
+    if (!user && auth) {
+      userAuth(dispatch)
+    } else if(user) router.push('/main')
+  }, [user]);
+
   const handleGoogle = async () => {
-      const provider = await new GoogleAuthProvider();
-      signInWithPopup(auth, provider).then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential: OAuthCredential | null = GoogleAuthProvider.credentialFromResult(result);
-        if(!credential) throw 'Can´t get connect with Google'
-        let token = credential.accessToken;
-        // The signed-in user info.
-        const user = result.user;
-        if (user.displayName){
-          //addUserToChat(user.displayName)
-          localStorage.setItem('user', user.displayName);
-          router.push('/main')
-          //dispatch(getAllMessages())
-          dispatch(setUser(user.displayName))
-        }
-      }).catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-      });
-    }
+    userSign(dispatch)
+  }
 
     return (
        <Button onClick={handleGoogle} type="button">Sign In Google Account</Button>     
