@@ -31,5 +31,6 @@ export const sliceUsers = createSlice({
 export const { setUser, addUser, removeUser } = sliceUsers.actions
 
 export const getSelectorUser = (store:RootState) => store.users.user
+export const getSelectorAllUser = (store:RootState) => store.users.users
 
 export default sliceUsers.reducer

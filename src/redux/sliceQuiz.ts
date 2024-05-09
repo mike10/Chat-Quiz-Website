@@ -30,6 +30,7 @@ export const sliceQuiz = createSlice({
     },
     setReadyQuizResult:(state, PayloadAction) => {
       state.isReadyQuizResult=PayloadAction.payload;
+      state.quizResult.length = 0
     },
     setQuizResult:(state, PayloadAction) => {
       console.log(PayloadAction.payload);

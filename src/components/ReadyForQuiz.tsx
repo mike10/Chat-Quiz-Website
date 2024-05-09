@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useReducer, useState } from "react";
 import PlayToQuiz from "./PlayToQuiz";
 import { ISendResult } from "@/utils/constants";
+import { getSelectorAllUser } from "@/redux/sliceUsers";
 
 const ReadyForQuiz: React.FC = () => {
   const dispatch = useDispatch()
@@ -13,6 +14,7 @@ const ReadyForQuiz: React.FC = () => {
   //const isPlayQuiz:boolean = useSelector(getSelectorQuizIsPlay)
   const isReadyQuizResult:boolean = useSelector(getSelectorIsReadyQuizResult)
   const quizResult:ISendResult[] = useSelector(getSelectorQuizResult)
+  const allUsers:Array<string> = useSelector(getSelectorAllUser)
 
   const [showForm, setShowForm] = useState<string>('showChoise')
 
@@ -20,7 +22,9 @@ const ReadyForQuiz: React.FC = () => {
     if(isReadyQuizResult) setShowForm('showResult')
   }, [isReadyQuizResult])
 
-  
+  useEffect(()=>{
+    if(quizResult.length === allUsers.length) alert('Quiz the end!')
+  }, [quizResult])
 
   const handleCancleQuiz = () => {
     setShowForm('showNothing')
@@ -55,11 +59,9 @@ const ReadyForQuiz: React.FC = () => {
       {showForm === "showResult" /*  && quizResult !== undefined */ ? (
         <div >
           {quizResult.map((item, index)=>{
-            return <div key={index}>
-              <p>{item.user}</p>
-              <div>{`scored ${item.rightAnswer} points`}</div>
-              
-            </div>
+            return  <div key={index}>
+                      <div>{`${item.user} scored ${item.rightAnswer} points`}</div>
+                    </div>
           })}
           <Button onClick={handleCancleQuiz}>Ok</Button>
         </div>

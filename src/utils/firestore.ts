@@ -100,12 +100,6 @@ export const getUsers = (dispatch:AppDispatch) => {
     (error) => {
       console.log(error);
     });
-  
-  /* old version
-   const unsubscribe = onSnapshot(doc(db, "users", "default"), (doc) => {
-    console.log("firestore-getUsers: ", doc.data());
-    if(doc.data()) dispatch(getAllUsers(doc.data()?.users))
-  }); */
   return ()=>{
     unsubscribe()
   }
@@ -143,15 +137,6 @@ export const quitUser = async(quitUser:string) => {
   } catch (e) {
     console.error("Error adding document: ", e);
   }
-  
-  /* try {  old version
-    const roomRef = doc(db, "users", "default");
-    await updateDoc(roomRef, {
-      users: arrayRemove(quitUser)
-    });
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  } */
 }
 
 export const addUserToChat = async (newUser:string) => {
